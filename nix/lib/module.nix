@@ -7,7 +7,8 @@
   flake.lib.internal.module =
     # Partially based on https://github.com/yunfachi/denix/blob/d90f816/lib/configurations/module.nix
     { genericConfigName, ... }:
-    module: {
+    module:
+    {
       flake.modules = builtins.listToAttrs (
         builtins.map
           (moduleSystem: {
@@ -67,5 +68,6 @@
             )
           )
       );
-    };
+    }
+    // (lib.filterAttrs (n: _v: !(builtins.elem n self.lib.notDenixAttrs)) module);
 }

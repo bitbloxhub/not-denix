@@ -13,6 +13,11 @@
       "homeManager"
     ];
 
+    notDenixAttrs = moduleSystems ++ [
+      "name"
+      "options"
+    ];
+
     # From https://github.com/yunfachi/denix/blob/d90f816/lib/attrset.nix#L4
     splitStrPath = lib.splitString ".";
 

@@ -1,5 +1,5 @@
 # not-denix: It's not [`denix`](https://github.com/yunfachi/denix)!
-Well, it's /like/ denix, but based on [`flake-parts`](https://flake.parts/)!
+Well, it's *like* denix, but based on [`flake-parts`](https://flake.parts/)!
 
 # Quickstart
 Run `nix flake init -t github:bitbloxhub/not-denix` in a directory.  

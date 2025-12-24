@@ -17,11 +17,9 @@ not-denix.module {
       packages.example = pkgs.hello;
     };
 
-  # Define your modules options here, remember it does NOT automaticaly prefix them with genericConfigName!
-  generic.always = {
-    options.my.example-module = {
-      enable = lib.mkEnableOption "example-module";
-    };
+  # Define your modules options here, they are automatically prefixed with genericConfigName!
+  options.example-module = {
+    enable = lib.mkEnableOption "example-module";
   };
 
   # Declare options for specific classes that only exist when options.my.example-module is true.

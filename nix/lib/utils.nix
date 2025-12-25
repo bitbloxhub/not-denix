@@ -42,10 +42,13 @@
         let
           applied_ = module args;
           applied =
-            if (self.lib.hasAttrs [ "config" "options" "imports" ] applied_) then
+            if (self.lib.hasAttrs [ "config" "options" ] applied_) then
               applied_
             else
-              { config = applied_; };
+              {
+                imports = self.lib.getAttrByStrPath "imports" applied_ [ ];
+                config = builtins.removeAttrs applied_ [ "imports" ];
+              };
         in
         {
           imports = self.lib.getAttrByStrPath "imports" applied [ ];

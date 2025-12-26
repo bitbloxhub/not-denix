@@ -8,11 +8,11 @@
       # nix
       ''
         inputs:
-        inputs.flake-parts.lib.mkFlake {
-          inherit inputs;
-          specialArgs.not-denix = inputs.not-denix.lib.factory { };
-        } ((inputs.import-tree.filterNot (inputs.nixpkgs.lib.hasSuffix "npins/default.nix")) ./nix)
+        inputs.flake-parts.lib.mkFlake { inherit inputs; } (
+          (inputs.import-tree.filterNot (inputs.nixpkgs.lib.hasSuffix "npins/default.nix")) ./nix
+        )
       '';
+
     inputs = {
       flake-file.url = "github:vic/flake-file";
       flake-parts = {
@@ -47,5 +47,6 @@
   imports = [
     inputs.flake-file.flakeModules.default
     inputs.flake-file.flakeModules.import-tree
+    inputs.not-denix.flakeModules.default
   ];
 }

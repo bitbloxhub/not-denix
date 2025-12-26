@@ -1,9 +1,9 @@
 {
   lib,
-  not-denix,
+  inputs,
   ...
 }:
-not-denix.module {
+inputs.not-denix.lib.module {
   # The name of the module, used for finding enable options.
   name = "example-module";
 

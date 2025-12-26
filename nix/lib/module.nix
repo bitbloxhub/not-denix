@@ -20,7 +20,7 @@
             builtins.map
               (moduleSystem: {
                 name = moduleSystem;
-                value.default =
+                value.${flakeConfig.defaultFlakeModule} =
                   {
                     lib,
                     config,

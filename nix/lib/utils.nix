@@ -35,7 +35,7 @@
     conditionalImport =
       module_: cond:
       let
-        module = if builtins.typeOf module_ == "lambda" then module_ else (_: module_);
+        module = wrap module_;
       in
       lib.setFunctionArgs (
         args:
@@ -57,5 +57,6 @@
         }
       ) (lib.functionArgs module);
 
+    wrap = arg: if builtins.typeOf arg == "lambda" then arg else (_: arg);
   };
 }

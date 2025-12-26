@@ -50,6 +50,8 @@
 
                     ifEnabled = self.lib.getAttrByStrPath "${moduleSystem}.ifEnabled" module { };
                     ifDisabled = self.lib.getAttrByStrPath "${moduleSystem}.ifDisabled" module { };
+
+                    options = self.lib.wrap (self.lib.getAttrByStrPath "options" module { });
                   in
                   {
                     imports = [
@@ -58,9 +60,9 @@
                       (self.lib.conditionalImport ifDisabled disabled)
                       (
                         if moduleSystem == "generic" then
-                          {
-                            options.${flakeConfig.genericConfigName} = self.lib.getAttrByStrPath "options" module { };
-                          }
+                          lib.setFunctionArgs (args: {
+                            options.${flakeConfig.genericConfigName} = options args;
+                          }) (lib.functionArgs options)
                         else
                           { }
                       )

@@ -69,14 +69,16 @@
               })
               (
                 lib.lists.uniqueStrings (
-                  (builtins.attrNames (lib.filterAttrs (n: _v: builtins.elem n self.lib.moduleSystems) module))
+                  (builtins.attrNames (lib.filterAttrs (n: _v: builtins.elem n flakeConfig.moduleSystems) module))
                   # Always evaluate the generic value for options.
                   ++ [ "generic" ]
                 )
               )
           );
         }
-        // (lib.filterAttrs (n: _v: !(builtins.elem n self.lib.notDenixAttrs)) module)
+        // (lib.filterAttrs (
+          n: _v: !(builtins.elem n (flakeConfig.moduleSystems ++ self.lib.notDenixAttrs))
+        ) module)
       )
     ];
   };

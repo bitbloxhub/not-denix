@@ -19,6 +19,17 @@
             e.g. a value of "my" will cause the nixos module to be in `flake.modules.nixos.my`.
           '';
         };
+        moduleSystems = lib.mkOption {
+          type = lib.types.listOf lib.types.str;
+          default = [
+            "generic"
+            "nixos"
+            "darwin"
+            "systemManager"
+            "homeManager"
+          ];
+          description = "All module systems supported by not-denix. Must at least include `generic`";
+        };
       };
     };
 }

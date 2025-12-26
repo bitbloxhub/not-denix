@@ -5,15 +5,7 @@
 }:
 {
   flake.lib = rec {
-    moduleSystems = [
-      "generic"
-      "nixos"
-      "darwin"
-      "systemManager"
-      "homeManager"
-    ];
-
-    notDenixAttrs = moduleSystems ++ [
+    notDenixAttrs = [
       "name"
       "options"
     ];

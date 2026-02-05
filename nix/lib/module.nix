@@ -16,69 +16,77 @@
           flakeConfig = config.not-denix;
         in
         {
-          flake.modules = builtins.listToAttrs (
-            builtins.map
-              (moduleSystem: {
-                name = moduleSystem;
-                value.${flakeConfig.defaultFlakeModule} =
-                  {
-                    lib,
-                    config,
-                    ...
-                  }:
-                  let
-                    args = rec {
-                      # instance of the user's config attrset
-                      genericConfig = config.${flakeConfig.genericConfigName};
+          flake = {
+            modules =
+              builtins.listToAttrs (
+                builtins.map
+                  (moduleSystem: {
+                    name = moduleSystem;
+                    value = {
+                      ${flakeConfig.defaultFlakeModule} =
+                        {
+                          lib,
+                          config,
+                          ...
+                        }:
+                        let
+                          args = rec {
+                            # instance of the user's config attrset
+                            genericConfig = config.${flakeConfig.genericConfigName};
 
-                      cfgPath = self.lib.splitStrPath module.name;
+                            cfgPath = self.lib.splitStrPath module.name;
 
-                      fromPath =
-                        with lib;
-                        path: if (length path) > 0 then lib.attrByPath path { } genericConfig else genericConfig;
+                            fromPath =
+                              with lib;
+                              path: if (length path) > 0 then lib.attrByPath path { } genericConfig else genericConfig;
 
-                      cfg = fromPath cfgPath;
-                      parent = fromPath (lib.dropEnd 1 cfgPath);
-                    };
+                            cfg = fromPath cfgPath;
+                            parent = fromPath (lib.dropEnd 1 cfgPath);
+                          };
 
-                    inherit (args) cfg;
+                          inherit (args) cfg;
 
-                    # If the `cfg.enable` option is missing, do not import ifEnabled or ifDisabled.
-                    enabled = self.lib.getAttrByStrPath "enable" cfg false;
-                    # Not `disabled = !enabled`, because it behaves differently when the 'enable' option is missing.
-                    disabled = !(self.lib.getAttrByStrPath "enable" cfg true);
+                          # If the `cfg.enable` option is missing, do not import ifEnabled or ifDisabled.
+                          enabled = self.lib.getAttrByStrPath "enable" cfg false;
+                          # Not `disabled = !enabled`, because it behaves differently when the 'enable' option is missing.
+                          disabled = !(self.lib.getAttrByStrPath "enable" cfg true);
 
-                    ifEnabled = self.lib.getAttrByStrPath "${moduleSystem}.ifEnabled" module { };
-                    ifDisabled = self.lib.getAttrByStrPath "${moduleSystem}.ifDisabled" module { };
+                          ifEnabled = self.lib.getAttrByStrPath "${moduleSystem}.ifEnabled" module { };
+                          ifDisabled = self.lib.getAttrByStrPath "${moduleSystem}.ifDisabled" module { };
 
-                    options = self.lib.wrap (self.lib.getAttrByStrPath "options" module { });
-                  in
-                  {
-                    imports = [
-                      (self.lib.getAttrByStrPath "${moduleSystem}.always" module { })
-                      (self.lib.conditionalImport ifEnabled enabled)
-                      (self.lib.conditionalImport ifDisabled disabled)
-                      (
-                        if moduleSystem == "generic" then
-                          lib.setFunctionArgs (args: {
-                            options.${flakeConfig.genericConfigName} = options args;
-                          }) (lib.functionArgs options)
-                        else
-                          { }
-                      )
-                    ];
-                  };
-              })
-              (
-                lib.lists.uniqueStrings (
-                  (builtins.attrNames (lib.filterAttrs (n: _v: builtins.elem n self.lib.moduleSystems) module))
-                  # Always evaluate the generic value for options.
-                  ++ [ "generic" ]
-                )
+                          options = self.lib.wrap (self.lib.getAttrByStrPath "options" module { });
+                        in
+                        {
+                          imports = [
+                            (self.lib.getAttrByStrPath "${moduleSystem}.always" module { })
+                            (self.lib.conditionalImport ifEnabled enabled)
+                            (self.lib.conditionalImport ifDisabled disabled)
+                            (
+                              if moduleSystem == "generic" then
+                                lib.setFunctionArgs (args: {
+                                  options.${flakeConfig.genericConfigName} = options args;
+                                }) (lib.functionArgs options)
+                              else
+                                { }
+                            )
+                          ];
+                        };
+                    }
+                    // (((module.flake or { }).modules or { }).${moduleSystem} or { });
+                  })
+                  (
+                    lib.lists.uniqueStrings (
+                      (builtins.attrNames (lib.filterAttrs (n: _v: builtins.elem n self.lib.moduleSystems) module))
+                      # Always evaluate the generic value for options.
+                      ++ [ "generic" ]
+                    )
+                  )
               )
-          );
+              // ((module.flake or { }).modules or { });
+          }
+          // (lib.filterAttrs (n: _v: n != "modules") (module.flake or { }));
         }
-        // (lib.filterAttrs (n: _v: !(builtins.elem n self.lib.notDenixAttrs)) module)
+        // (lib.filterAttrs (n: _v: !(builtins.elem n (self.lib.notDenixAttrs ++ [ "flake" ]))) module)
       )
     ];
   };
